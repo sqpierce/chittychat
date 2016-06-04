@@ -1,0 +1,65 @@
+<html>
+  <head>
+    <title>Chitty Chitty Chat Chat</title>
+    <%= action_cable_meta_tag %>
+    <%= javascript_include_tag "http://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js" %>
+    <%= javascript_include_tag "https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js" %>
+    <%= javascript_include_tag "application" %>
+  </head>
+  <body ng-app="chittyChat" ng-controller="MainCtrl">
+    <div id="app-title">
+      <h3>{{app_title}}</h3>
+    </div>
+    <div id="logged-in-as">
+      <span ng-if="!current_user">
+          <input type="text" ng-model="username"><button ng-click="login_or_create(username)">Log In Or Create User</button>
+      </span>
+      <span ng-if="current_user">
+          Logged In As: {{current_user_name}} <button ng-click="logout()">Log Out</button>
+      </span>
+    </div>
+    <div ng-if="current_user" id="container" style="width:100%;margin-top:20px;">
+        <div id="left" style="float:left; width:33.3%;">
+            <div id="topics">
+                <div><strong>Topics</strong></div>
+                <div ng-repeat="topic in topics | orderBy:'name'">
+                    <strong ng-if="current_topic == topic.id">*</strong>
+                    <a href ng-click="set_topic(topic.id)">{{topic.name}}</a>
+                </div>
+                <span>* = current topic</span>
+            </div>
+            <span>
+                <input type="text" ng-model="new_topic"><button ng-click="create_topic(new_topic);new_topic=''">Create Topic</button>
+            </span>
+            <div id="users" style="margin-top:20px;">
+                <div><strong>Direct Messages</strong></div>
+                    <div ng-repeat="user in users | orderBy:'name'">
+                        <span ng-hide="user.id == current_user">
+                            <strong ng-if="current_conversation == user.id">*</strong>
+                            <a href ng-click="set_current_conversation(user.id)">{{user.name}}</a>
+                        </span>
+                    </div>
+                    <span>* = current direct messages</span>
+                </ul>
+            </div>
+        </div>
+        <div id="right" style="float:right; width:66.6%;">
+            <div id="messages">
+                <div><strong>Messages</strong></div>
+                <div ng-if="! current_topic && ! current_conversation">Please select a topic or person for direct messages.</div>
+                <div ng-if="current_topic || current_conversation">
+                    <div ng-if="current_topic">Current Topic: {{current_topic_name}}</div>
+                    <div ng-if="current_conversation">Current Direct Messages: {{current_conversation_name}}</div>
+                    <dl ng-if="current_user" ng-repeat="message in messages">
+                        <dt><strong>{{message.sender.name}}</strong></dt>
+                        <dd>{{message.text}}</dd>
+                    </dl>
+                    <span>
+                        <input type="text" ng-model="message_to_add"><button ng-click="create_message(message_to_add)">Say!</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+  </body>
+</html>
